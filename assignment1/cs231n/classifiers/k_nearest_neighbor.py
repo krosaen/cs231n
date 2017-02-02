@@ -93,10 +93,12 @@ class KNearestNeighbor(object):
       # Compute the l2 distance between the ith test point and all training #
       # points, and store the result in dists[i, :].                        #
       #######################################################################
-      dists[i, :] = np.apply_along_axis(
-        np.linalg.norm,
-        1,
-        X[i] - self.X_train)
+      # dists[i, :] = np.apply_along_axis(
+      #   np.linalg.norm,
+      #   1,
+      #   X[i] - self.X_train)
+      dists[i, :] = np.sqrt(
+        np.sum((self.X_train - X[i, :]) ** 2, axis=1))
       #######################################################################
       #                         END OF YOUR CODE                            #
       #######################################################################
@@ -109,9 +111,6 @@ class KNearestNeighbor(object):
 
     Input / Output: Same as compute_distances_two_loops
     """
-    num_test = X.shape[0]
-    num_train = self.X_train.shape[0]
-    dists = np.zeros((num_test, num_train)) 
     #########################################################################
     # TODO:                                                                 #
     # Compute the l2 distance between all test points and all training      #
@@ -124,11 +123,24 @@ class KNearestNeighbor(object):
     # HINT: Try to formulate the l2 distance using matrix multiplication    #
     #       and two broadcast sums.                                         #
     #########################################################################
-    pass
+
+
+    # minus = X[:, None, :] - self.X_train
+    # squared = np.einsum('ijk,ijk->ij', minus, minus)
+    # return np.sqrt(squared)
+
+    num_test = X.shape[0]
+    num_train = self.X_train.shape[0]
+    X_norms = np.sum(X ** 2, axis=1, keepdims=True)
+    X_train_norms = np.sum(self.X_train ** 2, axis=1)
+    cross = -2.0 * X.dot(self.X_train.T)
+    dists = np.sqrt(X_norms + cross + X_train_norms)
+    return dists
+
+
     #########################################################################
     #                         END OF YOUR CODE                              #
     #########################################################################
-    return dists
 
   def predict_labels(self, dists, k=1):
     """
