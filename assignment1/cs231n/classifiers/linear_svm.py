@@ -19,6 +19,8 @@ def svm_loss_naive(W, X, y, reg):
     Returns a tuple of:
     - loss as single float
     - gradient with respect to weights W; an array of same shape as W
+
+    http://cs231n.github.io/optimization-1/#analytic
     """
     dW = np.zeros(W.shape)  # initialize the gradient as zero
 
@@ -28,17 +30,18 @@ def svm_loss_naive(W, X, y, reg):
     loss = 0.0
     for i in xrange(num_train):
         scores = X[i].dot(W)
-        correct_class_score = scores[y[i]]
+        correct_class = y[i]
+        correct_class_score = scores[correct_class]
         num_missing_thresh = 0
         for j in xrange(num_classes):
-            if j == y[i]:
+            if j == correct_class:
                 continue
             margin = scores[j] - correct_class_score + 1  # note delta = 1
             if margin > 0:
                 loss += margin
                 num_missing_thresh += 1
-        # print("dW[i].shape: {}, X[i].shape: {}".format(dW[i].shape, X[i].shape))
-        dW[i] = scores * num_missing_thresh
+                dW[:, j] += X[i]
+        dW[:, correct_class] += X[i] * -num_missing_thresh
 
     # Right now the loss is a sum over all training examples, but we want it
     # to be an average instead so we divide by num_train.
@@ -55,7 +58,7 @@ def svm_loss_naive(W, X, y, reg):
     # loss is being computed. As a result you may need to modify some of the    #
     # code above to compute the gradient.                                       #
     #############################################################################
-
+    dW /= num_train
 
     return loss, dW
 
