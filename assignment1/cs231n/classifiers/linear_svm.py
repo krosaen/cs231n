@@ -48,7 +48,7 @@ def svm_loss_naive(W, X, y, reg):
     loss /= num_train
 
     # Add regularization to the loss.
-    loss += 0.5 * reg * np.sum(W * W)
+    loss += reg * np.sum(W * W)
 
     #############################################################################
     # TODO:                                                                     #
@@ -78,11 +78,16 @@ def svm_loss_vectorized(W, X, y, reg):
     # Implement a vectorized version of the structured SVM loss, storing the    #
     # result in loss.                                                           #
     #############################################################################
-    pass
+    scores = X.dot(W)
+    correct_scores = np.choose(y, scores.T)
+    margins = scores - correct_scores.reshape(-1, 1) + 1
+    margins = margins.clip(0)
+    costs = margins.sum(axis=1) - 1 # correct for extra 1 added above to correct class column
+    loss = costs.sum() / X.shape[0]
+    loss += reg * np.sum(W * W)
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
-
 
     #############################################################################
     # TODO:                                                                     #
