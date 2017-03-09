@@ -72,6 +72,7 @@ def svm_loss_vectorized(W, X, y, reg):
     """
     loss = 0.0
     dW = np.zeros(W.shape)  # initialize the gradient as zero
+    num_train = X.shape[0]
 
     #############################################################################
     # TODO:                                                                     #
@@ -82,8 +83,9 @@ def svm_loss_vectorized(W, X, y, reg):
     correct_scores = np.choose(y, scores.T)
     margins = scores - correct_scores.reshape(-1, 1) + 1
     margins = margins.clip(0)
-    costs = margins.sum(axis=1) - 1 # correct for extra 1 added above to correct class column
-    loss = costs.sum() / X.shape[0]
+    margins[np.arange(num_train), y] = 0
+    costs = margins.sum(axis=1)
+    loss = costs.sum() / num_train
     loss += reg * np.sum(W * W)
     #############################################################################
     #                             END OF YOUR CODE                              #
@@ -98,7 +100,15 @@ def svm_loss_vectorized(W, X, y, reg):
     # to reuse some of the intermediate values that you used to compute the     #
     # loss.                                                                     #
     #############################################################################
-    pass
+    margin_counts = np.zeros(margins.shape)
+    np.putmask(margin_counts, margins > 0, 1)
+    wrong_per_row = margin_counts.sum(axis=1)
+    margin_counts[np.arange(num_train), y] = -wrong_per_row
+
+    dW = X.T.dot(margin_counts)
+    dW /= num_train
+    dW += 2 * reg * W     # regularization
+
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
