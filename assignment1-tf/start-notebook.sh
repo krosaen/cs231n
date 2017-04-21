@@ -1,5 +1,6 @@
 #@IgnoreInspection BashAddShebang
-nvidia-docker run --rm -u root -e NB_UID=`id -u` \
-  -p 8080:8888 -p 6006:6006 \
-  -v `pwd`:/root \
-  -it tf-notebook sh -c "jupyter notebook --ip 0.0.0.0 ."
+nvidia-docker run --rm --name run-tf-notebook \
+  -p 8080:8888 \
+  -v `pwd`:/root/notebooks \
+  -v `pwd`/tf-logs:/root/logs \
+  -it tf-notebook sh -c "jupyter notebook --ip 0.0.0.0 /root/notebooks"

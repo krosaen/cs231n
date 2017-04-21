@@ -136,8 +136,11 @@ def np_softmax_loss(W, X, y, reg):
 def tf_softmax_loss(W, X, y, reg):
     tf_W = tf.placeholder(tf.float32, [None, None], name='W')
     tf_X = tf.placeholder(tf.float32, [None, None], name='X')
-    tf_y = tf.placeholder(tf.int64, [None], name='y')
+    tf_y = tf.placeholder(tf.int32, [None], name='y')
+    tf_reg = tf.placeholder(tf.float32)
+
     scores = tf.matmul(tf_X, tf_W, name='scores')
+    # normalize for numerical stability http://cs231n.github.io/linear-classify/#softmax
     max_scores = tf.reduce_max(scores, reduction_indices=[1], keep_dims=True, name='max_scores')
     scores_stable = tf.subtract(scores, max_scores, name='scores_stable')
     exp_scores = tf.exp(scores_stable)
@@ -145,9 +148,10 @@ def tf_softmax_loss(W, X, y, reg):
 
     p = exp_scores / exp_scores_sum
 
+
     p_correct = tf.gather_nd(
         p,
-        tf.transpose(tf.stack([tf.range(tf.cast(tf.shape(tf_y)[0], tf.int64), dtype=tf.int64),
+        tf.transpose(tf.stack([tf.range(tf.shape(tf_y)[0]),
                                tf_y])))
     loss = tf.reduce_mean(-tf.log(p_correct))
 
@@ -159,7 +163,8 @@ def tf_softmax_loss(W, X, y, reg):
             feed_dict={
                 tf_W: W,
                 tf_X: X,
-                tf_y: y
+                tf_y: y,
+                tf_reg: reg
             })
 
 
@@ -167,7 +172,6 @@ def sample_images(num_pixels, num_images):
     return np.clip(
         (np.ones((num_images, num_pixels)) * 100 + np.random.randn(num_images, num_pixels) * 50).astype(np.int32),
         0, 255)
-
 
 def demo_np_vs_tf_softmax():
     """
