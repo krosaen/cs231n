@@ -8,6 +8,6 @@ As an added exercise, I've taken to implementing the same assignments (that requ
 as well, e.g compare a linear softmax classifier notebook in 
  [numpy](https://github.com/krosaen/cs231n/blob/master/assignment1/softmax.ipynb)
  and in 
- [tensorflow](https://github.com/krosaen/cs231n/blob/master/assignment1-tf/softmax.ipynb)
+ [tensorflow](https://github.com/krosaen/cs231n/blob/master/assignment1-tf/softmax.ipynb).
 
 More info on my studies on my [machine learning curriculum](http://karlrosaen.com/ml) page.
