@@ -1,3 +1,7 @@
 *idea
 *-checkpoint.ipynb
 assignment1-tf/tf-logs
+.jupyter
+.ipython
+.cache
+.bash_history
