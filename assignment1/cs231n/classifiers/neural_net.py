@@ -74,7 +74,9 @@ class TwoLayerNet(object):
         # Store the result in the scores variable, which should be an array of      #
         # shape (N, C).                                                             #
         #############################################################################
-        pass
+        out1 = X.dot(W1) + b1.T
+        out1_relu = np.maximum(out1, np.zeros_like(out1))
+        scores = out1_relu.dot(W2) + b2.T
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -92,7 +94,15 @@ class TwoLayerNet(object):
         # classifier loss. So that your results match ours, multiply the            #
         # regularization loss by 0.5                                                #
         #############################################################################
-        pass
+        scores_shifted = scores - np.max(scores, axis=1).reshape(scores.shape[0], -1)
+        scores_exp = np.exp(scores_shifted)
+        scores_softmax = scores_exp / np.sum(scores_exp, axis=1).reshape(scores_exp.shape[0], -1)
+
+        scores_correct = scores_softmax[range(N), y]
+        loss = np.sum(-np.log(scores_correct))
+        loss /= N
+        loss += 0.5 * reg * (np.sum(W1*W1) + np.sum(W2*W2))
+
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
