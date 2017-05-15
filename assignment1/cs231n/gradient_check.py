@@ -9,7 +9,6 @@ def eval_numerical_gradient(f, x, verbose=True, h=0.00001):
     - x is the point (numpy array) to evaluate the gradient at
     """
 
-    fx = f(x)  # evaluate function value at original point
     grad = np.zeros_like(x)
     # iterate over all indexes in x
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
@@ -27,7 +26,7 @@ def eval_numerical_gradient(f, x, verbose=True, h=0.00001):
         # compute the partial derivative with centered formula
         grad[ix] = (fxph - fxmh) / (2 * h)  # the slope
         if verbose:
-            print("{}, {}".format(ix, grad[ix])
+            print("{}, {}".format(ix, grad[ix]))
         it.iternext()  # step to next dimension
 
     return grad
