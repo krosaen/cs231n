@@ -63,9 +63,6 @@ def softmax_loss_vectorized(W, X, y, reg):
 
     Inputs and outputs are the same as softmax_loss_naive.
     """
-    # Initialize the loss and gradient to zero.
-    loss = 0.0
-    dW = np.zeros_like(W)
 
     num_train = X.shape[0]
 
@@ -79,16 +76,16 @@ def softmax_loss_vectorized(W, X, y, reg):
     scores = X.dot(W)
     scores_shifted = scores - scores.max(axis=1).reshape(scores.shape[0], -1)
     exp_scores = np.exp(scores_shifted)
-    p = exp_scores / np.sum(exp_scores, axis=1).reshape(exp_scores.shape[0], -1)
-    p_correct = np.choose(y, p.T)
-    loss = np.sum(-np.log(p_correct))
+    scores_softmax = exp_scores / np.sum(exp_scores, axis=1).reshape(exp_scores.shape[0], -1)
+    scores_correct = np.choose(y, scores_softmax.T)
+    loss = np.sum(-np.log(scores_correct))
 
     loss /= num_train
     loss += reg * np.sum(W * W)
 
     ys = np.zeros(scores.shape)
     ys[np.arange(scores.shape[0]), y] = 1
-    dW = X.T.dot((p - ys))
+    dW = X.T.dot((scores_softmax - ys))
     dW /= num_train
     dW += 2 * reg * W     # regularization
 
